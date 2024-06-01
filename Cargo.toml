@@ -1,0 +1,18 @@
+[package]
+name = "automaton"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+argfile = "0.2.0"
+clap = { version = "4.5.4", features = ["derive"] }
+clap_logger = "0.3.3"
+clio = { version = "0.3.5", features = ["clap-parse"] }
+lazy_static = "1.4.0"
+log = "0.4.21"
+pest = "2.7.10"
+pest_derive = "2.7.10"
+rhai = "1.18.0"
+thiserror = "1.0.61"
+wild = "2.2.1"
+xml-rs = "0.8.20"
