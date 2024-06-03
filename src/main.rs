@@ -1,4 +1,6 @@
 mod conf;
+mod errors;
+
 use clap::Parser;
 use clio::*;
 use clap_logger::LevelFilter;
