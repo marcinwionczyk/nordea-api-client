@@ -1,3 +1,5 @@
+use exitcode::ExitCode;
+
 pub struct BasicError {
     pub message: String,
     pub details: String,
@@ -12,6 +14,11 @@ impl Default for BasicError {
     }
 }
 
+/// Used when the provided test data is invalid.
+///
+/// DataErrors are not be caught by keywords that run other keywords
+/// (e.g. `Run Keyword And Expect Error`). Libraries should thus use
+/// this exception with care.
 pub struct DataError {
     pub message: String,
     pub details: String,
@@ -38,55 +45,11 @@ pub struct TimeoutError {
     pub test_timeout: bool
 }
 
-pub struct ExecutionStatusError {
-    pub message: String,
-    pub test_timeout: bool,
-    pub keyword_timeout: bool,
-    pub syntax: bool,
-    pub exit: bool,
-    continue_on_failure: bool,
-    pub skip: bool,
-    pub return_value: Option<String>,
-    pub parent: Option<ExecutionStatusError>,
-    pub children: Option<Vec<ExecutionStatusError>>
-}
-
-impl ExecutionStatusError {
-    fn new(message: String) -> ExecutionStatusError {
-        ExecutionStatusError {
-            message,
-            test_timeout: false,
-            keyword_timeout: false,
-            syntax: false,
-            exit: false,
-            continue_on_failure: false,
-            skip: false,
-            return_value: None,
-            parent: None,
-            children: None
-        }
-    }
-    pub fn timeout(&self) -> bool {
-        self.keyword_timeout || self.test_timeout
-    }
-    fn dont_continue(&self) -> bool {
-        self.timeout() || self.syntax || self.exit
-    }
-    fn continue_on_failure(&self) -> bool {
-        self.continue_on_failure
-    }
-    fn set_continue_on_failure(&mut self, continue_on_failure: bool) {
-        self.continue_on_failure = continue_on_failure;
-        if let Some(children) = &mut self.children {
-            for child in children {
-                child.continue_on_failure = continue_on_failure;
-            }
-        }
-    }
-}
-
-pub enum ExecutionStatusErrorEnum {
-
+pub trait ExecutionStatusTrait {
+    fn timeout(&self) -> bool;
+    fn dont_continue(&self) -> bool;
+    fn continue_on_failure(&self) -> bool;
+    fn continue_on_failure_mut(&mut self, continue_on_failure: bool);
 }
 
 pub enum AutomatonError{
