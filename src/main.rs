@@ -2,9 +2,12 @@ mod conf;
 mod errors;
 mod running;
 
+use anyhow::Context;
 use clap::Parser;
 use clio::*;
 use clap_logger::LevelFilter;
+use rhai::{Engine, EvalAltResult};
+use crate::errors::AutomatonError;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None, name = "automaton")]
@@ -152,8 +155,11 @@ struct Args {
     paths: Vec<Input>
 }
 
-fn main() -> Result<()>{
-    let mut args = Args::parse();
-    println!("{:?}", args);
+fn main() -> anyhow::Result<()>{
+    let args = Args::parse();
+    log::trace!("{:?}", args);
+    let engine = Engine::new();
+    let result = engine.eval::<i64>("40 + 2").expect("Could not convert Rhai script");
+    println!("Answer: {result}");
     Ok(())
 }
