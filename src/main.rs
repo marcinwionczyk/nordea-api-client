@@ -1,13 +1,7 @@
-mod conf;
-mod errors;
-mod running;
-
-use anyhow::Context;
 use clap::Parser;
 use clio::*;
 use clap_logger::LevelFilter;
-use rhai::{Engine, EvalAltResult};
-use crate::errors::AutomatonError;
+use rhai::Engine;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None, name = "automaton")]

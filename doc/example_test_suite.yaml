@@ -1,16 +1,14 @@
 Settings:
   Resource: ../resources/common.yaml
   Test Teardown: Close Application
+  Documentation:
 Variables:
   Name: John Doe
 
 Testcases:
-  - Verify successful login to some page:
-      documentation: This test case verifies that user is able to successfully Login to OrangeHRM
-      tags:  Smoke
-      template:
-        - [https://example.com, dupa, cycki, 10]
-        - [https://example.com, dope, cycki, 20]
-      test_function: some function writen in rhai script
+  - Push button:
+
+
+
 
 

@@ -1,0 +1,37 @@
+Feature: Account Information retrieval
+  As a client,
+  I want to retrieve account information,
+  So that I can provide user with the account details
+
+  Scenario: Retrieve list of accounts with valid details
+    Given I have a valid access token
+    When I send a GET request to "/v5/accounts"
+    Then The response status should be 200
+    And I should receive a list of account details
+
+  Scenario: Retrieve list of accounts with invalid token
+    Given I have an invalid access token
+    When I send a GET request to "/v5/accounts"
+    Then The response status should be 401
+    And I should receive an error message indicating the invalid token
+
+  Scenario: Retrieve list of accounts with a missing required header
+    Given I have a valid access token
+    But I send a request with a missing required header
+    When I send a GET request to "/v5/accounts"
+    Then The response status should be 400
+    And I should receive an error message indicating the missing header
+
+  Scenario: Retrieve list of accounts without a valid TPP session
+    Given I have a valid access token
+    But I do not have a valid TPP session
+    When I send a GET request to "/v5/accounts"
+    Then The response status should be 403
+    And I should receive an error message indicating invalid TPP session
+
+  Scenario: Retrieve list of accounts after PSU session expires
+    Given I have a valid access token
+    But The PSU session just expired
+    When I send a GET request to "/v5/accounts"
+    Then The response status should be 401
+    And I should receive an error message indicating expired PSU session
