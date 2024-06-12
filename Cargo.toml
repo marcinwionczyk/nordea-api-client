@@ -1,11 +1,12 @@
 [package]
-name = "nordea"
+name = "automaton-test-framework"
 version = "0.1.0"
 edition = "2021"
 
 [dev-dependencies]
 cucumber = "0.21.0"
 playwright = "0.0.20"
+randomizer = "0.1.2"
 
 [dependencies]
 serde = "^1.0"

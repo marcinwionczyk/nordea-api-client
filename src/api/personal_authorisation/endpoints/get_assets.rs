@@ -34,20 +34,16 @@ pub enum GetAssetsUsingGetError {
 pub async fn get_assets(
     configuration: &configuration::Configuration,
     access_token: &str,
-    x_ibm_client_id: &str,
-    x_ibm_client_secret: &str,
     x_nordea_originating_user_agent: Option<&str>,
-    x_nordea_originating_user_ip: Option<&str>,
+    x_nordea_originating_user_ip: Option<&str>
 ) -> Result<crate::api::personal_authorisation::models::AssetResponse, Error<GetAssetsUsingGetError>> {
-    let local_var_configuration = configuration;
 
-    let local_var_client = &local_var_configuration.client;
     let date = nordea_utc_now();
-    let local_var_uri_str = format!("{}/v5/assets", local_var_configuration.base_path);
+    let local_var_uri_str = format!("{}/v5/assets", configuration.base_path);
     let mut local_var_req_builder =
-        local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
+        configuration.client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
+    if let Some(ref local_var_user_agent) = configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
@@ -63,9 +59,9 @@ pub async fn get_assets(
     let signature_header = encrypt_signature(signature, configuration);
     local_var_req_builder = local_var_req_builder.header("Signature", signature_header);
     local_var_req_builder =
-        local_var_req_builder.header("X-IBM-Client-Id", x_ibm_client_id.to_string());
+        local_var_req_builder.header("X-IBM-Client-Id", configuration.x_ibm_client_id.to_string());
     local_var_req_builder =
-        local_var_req_builder.header("X-IBM-Client-Secret", x_ibm_client_secret.to_string());
+        local_var_req_builder.header("X-IBM-Client-Secret", configuration.x_ibm_client_secret.to_string());
     local_var_req_builder = local_var_req_builder.header(
         "X-Nordea-Originating-Date",
         date.clone(),
@@ -88,7 +84,7 @@ pub async fn get_assets(
     }
 
     let local_var_req = local_var_req_builder.build()?;
-    let local_var_resp = local_var_client.execute(local_var_req).await?;
+    let local_var_resp = configuration.client.execute(local_var_req).await?;
     let local_var_status = local_var_resp.status();
     let local_var_content = local_var_resp.text().await?;
     if !local_var_status.is_client_error() && !local_var_status.is_server_error() {
