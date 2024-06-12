@@ -4,9 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dev-dependencies]
-cucumber = "0.21.0"
+cucumber = { version = "0.21.0", features = ["tracing", "output-junit"] }
 playwright = "0.0.20"
 randomizer = "0.1.2"
+tracing = "0.1.40"
 
 [dependencies]
 serde = "^1.0"
@@ -20,6 +21,7 @@ base64 = "0.22.1"
 chrono = "0.4.26"
 tokio = { version = "1.28.2", features = ["macros", "rt-multi-thread", "time"] }
 static-include-bytes = "2.0.0"
+tracing = "0.1.40"
 
 [[test]]
 name = "nordea"

@@ -20,7 +20,6 @@ pub enum Error<T> {
     ResponseError(ResponseContent<T>),
 }
 
-
 impl<T> fmt::Display for Error<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let (module, e) = match self {
@@ -54,6 +53,11 @@ impl<T: fmt::Debug> error::Error for Error<T> {
     }
 }
 
+impl<T> Default for Error<T> {
+    fn default() -> Self {
+        todo!()
+    }
+}
 
 impl<T> From<reqwest::Error> for Error<T> {
     fn from(e: reqwest::Error) -> Self {
