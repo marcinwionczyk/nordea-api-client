@@ -43,7 +43,7 @@ impl Configuration {
             base_path: "https://api.nordeaopenbanking.com/personal".to_owned(),
             user_agent: Some("OpenAPI-Generator/5.0/rust".to_owned()),
             redirect_url: "https://example.com".to_string(),
-            x_ibm_client_secret: "de0cd58b761cd4075d31177f1dcb5c88".to_string(),
+            x_ibm_client_secret: "15990986dbafbb0d1295d38c6a500af2".to_string(),
             x_ibm_client_id: "c288d1af82c4dc30e29454b4fb28dff8".to_string(),
             originating_host: "api.nordeaopenbanking.com".to_string(),
             client: reqwest::Client::builder()
