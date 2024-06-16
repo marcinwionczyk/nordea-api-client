@@ -59,7 +59,7 @@ pub async fn access_token_using_post(
     grant_type: &str,
     x_nordea_originating_user_agent: Option<&str>,
     x_nordea_originating_user_ip: Option<&str>,
-    code: Option<&str>,
+    code: Option<String>,
     redirect_uri: Option<&str>,
     refresh_token: Option<&str>,
 ) -> Result<crate::api::personal_authorisation::models::BearerToken, Error<AccessTokenUsingPostError>> {
@@ -84,12 +84,12 @@ pub async fn access_token_using_post(
         "authorization_code" => {
             match redirect_uri {
                 None => {
-                    hash_map.insert("code".to_string(), code.unwrap().to_string());
+                    hash_map.insert("code".to_string(), code.clone().unwrap());
                     hash_map.insert("grant_type".to_string(), "authorization_code".to_string());
                     resolve_request_url_encoded(&hash_map)
                 },
                 Some(r) => {
-                    hash_map.insert("code".to_string(), code.unwrap().to_string());
+                    hash_map.insert("code".to_string(), code.clone().unwrap());
                     hash_map.insert("grant_type".to_string(), "authorization_code".to_string());
                     hash_map.insert("redirect_uri".to_string(), r.to_string());
                     resolve_request_url_encoded(&hash_map)
@@ -103,9 +103,7 @@ pub async fn access_token_using_post(
         },
         _ => "".to_string()
     };
-    println!("==> form encoded: \n{}", form_encoded.clone());
     let digest = calculate_digest(form_encoded.clone());
-    println!("==> exchange token digest: \n{}", digest.clone());
     local_var_req_builder = local_var_req_builder.header("Digest", digest.clone());
     let signature = get_signature_base(
         Url::parse(local_var_uri_str.as_str()).unwrap(),
@@ -135,9 +133,9 @@ pub async fn access_token_using_post(
             local_var_param_value.to_string(),
         );
     }
-    let mut local_var_form_params = std::collections::HashMap::new();
+    let mut local_var_form_params = HashMap::new();
     if let Some(local_var_param_value) = code {
-        local_var_form_params.insert("code", local_var_param_value.to_string());
+        local_var_form_params.insert("code", local_var_param_value);
     }
     local_var_form_params.insert("grant_type", grant_type.to_string());
     if let Some(local_var_param_value) = redirect_uri {
@@ -168,7 +166,6 @@ pub async fn access_token_using_post(
     }
 }
 #[allow(dead_code)]
-
 pub async fn authorization_v5_se_fi_dk_no(
     configuration: &configuration::Configuration,
     request: crate::api::personal_authorisation::models::AuthRequest,

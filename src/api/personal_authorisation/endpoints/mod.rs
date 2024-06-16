@@ -11,7 +11,6 @@ pub struct ResponseContent<T> {
 }
 
 #[allow(dead_code)]
-
 #[derive(Debug)]
 pub enum Error<T> {
     Reqwest(reqwest::Error),

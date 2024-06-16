@@ -8,7 +8,7 @@ use url::Url;
 use crate::api::configuration::Configuration;
 use static_include_bytes::static_include_bytes;
 
-static_include_bytes!(#[no_mangle] EIDAS_PRIVATE_KEY = concat!(env!("EIDAS_PRIVATE_KEY_DIR"), "/private-key.pk8"));
+static_include_bytes!(#[no_mangle] EIDAS_PRIVATE_KEY = "/home/wiono/RustroverProjects/automaton-test-framework/certs/private-key.pk8");
 pub fn nordea_utc_now() -> String {
     Utc::now().format("%a, %d %b %Y %T GMT").to_string()
 }
@@ -115,4 +115,66 @@ pub fn encrypt_signature(signature_base: SignatureBase, configuration: &Configur
     let signature_header = format!("keyId=\"{}\",algorithm=\"rsa-sha256\",headers=\"{}\",signature=\"{}\"",
                                    configuration.x_ibm_client_id, signature_base.headers, general_purpose::STANDARD.encode(signature));
     signature_header
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+    use crate::api::personal_authorisation::endpoints::decoupled_authentication_and_authorization::{access_token_using_post, authorization_v5_se_fi_dk_no};
+    use crate::api::personal_authorisation::endpoints::get_assets::get_assets;
+    use crate::api::personal_authorisation::models::AuthRequest;
+    use crate::api::personal_authorisation::models::auth_request::{AuthenticationMethod, Country, Language};
+    use crate::api::personal_authorisation::models::Scope::{AccountsBalances, AccountsBasic, AccountsTransactions, PaymentsMultiple};
+    use super::*;
+    #[tokio::test]
+    /// Given I have a valid access token
+    /// When I send a GET request to "/v5/assets"
+    /// Then The response should be 200 code
+    /// Then I should receive user assets information
+    async fn get_valid_access_token_then_response_from_v5_assets_should_be_200_ok_status() {
+        let configuration = Configuration::new();
+        // prepare params for /decoupled/v5/authorize endpoint
+        let mut auth_request = AuthRequest::new(
+            Country::Dk, 3600, "https://www.example.com".to_string(),
+            vec![AccountsBasic, AccountsBalances, AccountsTransactions, PaymentsMultiple],
+            "anyString".to_string(),
+        );
+        auth_request.account_list = Some(vec!["ALL".to_string()]);
+        auth_request.authentication_method = Some(AuthenticationMethod::MtaDk);
+        auth_request.language = Some(Language::En);
+        auth_request.max_tx_history = Some(10);
+        auth_request.skip_account_selection = Some(true);
+        // execute POST personal/v5/decoupled/authentications endpoint and get "Location" header
+        let headers_result = authorization_v5_se_fi_dk_no(&configuration, auth_request, None, None).await;
+        assert!(headers_result.is_ok());
+        let headers = headers_result.unwrap();
+        let location_header = headers.get("location");
+        assert!(location_header.is_some());
+        let location = String::from_utf8_lossy(location_header.unwrap().as_bytes()).into_owned();
+        // extract "code" from Location header
+        let location_as_url = Url::parse(location.as_str());
+        assert!(location_as_url.is_ok());
+        let query_hash: HashMap<String, String> = location_as_url.unwrap().query_pairs().into_owned().collect();
+        let code = query_hash.get("code").map(|s| s.to_string());
+        assert!(code.is_some());
+        // use that "code" to get access token
+        let get_token_result =
+            access_token_using_post(&configuration, "authorization_code",
+                                    None, None, code, Some("https://www.example.com"), None).await;
+        assert!(get_token_result.is_ok());
+        // with access token we can get assets
+        if let Some(access_token) = get_token_result.unwrap().access_token {
+            let assets_result = get_assets(&configuration, &access_token, None, None).await;
+            assert!(assets_result.is_ok());
+            let group_header = assets_result.as_ref()
+                .expect("/v5/assets response should have JSON body")
+                .group_header.clone()
+                .expect("/v5/assets response should have JSON with group_header");
+            let response = assets_result
+                .expect("/v5/assets response should have JSON body")
+                .response;
+            assert_eq!(group_header.http_code, Some(200));
+            assert!(response.is_some());
+        }
+    }
 }
