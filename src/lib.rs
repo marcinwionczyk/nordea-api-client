@@ -8,7 +8,7 @@ use url::Url;
 use crate::api::configuration::Configuration;
 use static_include_bytes::static_include_bytes;
 
-static_include_bytes!(#[no_mangle] EIDAS_PRIVATE_KEY = "/home/wiono/RustroverProjects/automaton-test-framework/certs/private-key.pk8");
+static_include_bytes!(#[no_mangle] EIDAS_PRIVATE_KEY = concat!(env!("EIDAS_PRIVATE_KEY_DIR"), "/private-key.pk8"));
 pub fn nordea_utc_now() -> String {
     Utc::now().format("%a, %d %b %Y %T GMT").to_string()
 }
@@ -175,6 +175,7 @@ mod tests {
                 .response;
             assert_eq!(group_header.http_code, Some(200));
             assert!(response.is_some());
+            println!("/v5/assets response:\n{:?}", response.unwrap());
         }
     }
 }
