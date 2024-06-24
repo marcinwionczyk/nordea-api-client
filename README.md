@@ -10,5 +10,5 @@ containing `private-key.pk8` file. Checkout `certs/how_to_create_private_key.md`
 I have created so far functions to authorize in personal segment, decoupled mode. 
 My goal is to become a Rust Developer. 
 Nordea has a wide range of available APIs so there is a lot of work to do. 
-If you want to show interest, please [buy me a coffee](https://buymeacoffee.com/mwionczyk) and I will implement your desired Nordea API part.
-I will add 
+If you want to show interest, please [buy me a coffee](https://buymeacoffee.com/mwionczyk) and I will implement your desired Nordea API part in no time.
+Otherwise I will add next APIs in my own pace, without hurry.
