@@ -8,6 +8,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  EIDAS_PRIVATE_KEY_DIR: certs
 
 jobs:
   build:
